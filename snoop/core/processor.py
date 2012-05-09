@@ -29,16 +29,22 @@ class ProcessorBlock:
     def __init__(self, processors=[]):
         self.processors = processors
         self.pool = ThreadPool(processes=2)
+    def __del__(self):
+        self.pool.close()
+        self.pool.join()
     def event(self, ev):
         '''Call `Processor.event(ev)` for each processor'''
         for processor in self.processors:
             processor.event(ev)
-    def sample(self, writer, timestamp=int(time.time()/60), doc={}):
-        '''Sample all processors through `Writer` `writer`.
+    def sample(self):
+        '''Call `Processor.sample()` for each processor.
         
-        `writer` is run with each processor's `sample` method, farming out
-        both the sampling and writing to multiple threads (preventing I/O-heavy
-        `sample` methods from blocking processing).
+        This is done asynchronously with a thread pool farm sampling out to
+        multiple cores and prevent I/O-heavy sample methods from blocking
+        processing.
+
+        Returns a `multiprocessing.pool.AsyncResult`; `get()` the results out
+        when it is `ready()`.
         '''
-        self.pool.map_async(lambda x: writer.write(*x), [(processor.name, timestamp, processor.sample) for processor in self.processors])
+        return self.pool.map_async(lambda x: (x.name, x.sample()), self.processors)
 
