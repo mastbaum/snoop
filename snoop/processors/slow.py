@@ -1,6 +1,6 @@
 import urllib2
 import time
-from snoop.core import Processor
+from snoop.core.processor import Processor
 
 class Slow(Processor):
     def __init__(self, delay=5):

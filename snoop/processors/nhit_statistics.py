@@ -1,5 +1,5 @@
 from rat import ROOT
-from snoop.core import Processor, ProcessorAbort
+from snoop.core.processor import Processor, ProcessorAbort
 
 class NHITStatistics(Processor):
     def __init__(self):

@@ -3,9 +3,9 @@ import time
 
 import config
 
-from snoop.core import airfill_dsreader
-from snoop.core import ProcessorBlock
-from snoop.core import PrintWriter
+from snoop.core.processor import ProcessorBlock
+from snoop.core.reader import AirfillReader
+from snoop.core.writer import PrintWriter
 
 from snoop.processors import NHITStatistics
 from snoop.processors import Slow
@@ -24,7 +24,8 @@ if __name__ == '__main__':
         print 'Usage:', sys.argv[0], '[filename]'
         sys.exit(1)
 
-    events = airfill_dsreader(sys.argv[1])
+    reader = AirfillReader(sys.argv[1])    
+    events = reader.read()
 
     results = []
     start_time = time.time()

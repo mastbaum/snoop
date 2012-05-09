@@ -1,5 +1,4 @@
 from multiprocessing.pool import ThreadPool
-import time
 
 class ProcessorAbort(Exception):
     def __init__(self, value):
