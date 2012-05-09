@@ -3,7 +3,10 @@ from rat import dsreader, ROOT
 # normal dsreader imported into local namespace from rat
 
 def tree_reader(filename, tree, branch, obj):
-    '''Read events from a ROOT tree'''
+    '''Read data from the branch named `branch` of a ROOT tree named `tree`
+    in a file `filename`. `obj` is a "reference" to an object of the type
+    stored in the tree (cf. `SetBranchAddress(branch, &obj)`).
+    '''
     tree = ROOT.TChain(tree)
     tree.Add(filename)
     tree.SetBranchAddress(branch, obj)
@@ -22,7 +25,8 @@ def packed_dsreader(filename):
     `filename`.
     '''
     rec = ROOT.RAT.DS.PackedRec()
-    yield tree_reader(filename, 'PackT', 'PackRec', rec)
+    for o in tree_reader(filename, 'PackT', 'PackRec', rec):
+        yield o
 
 def airfill_dsreader(filename):
     '''Read events from an air-fill style packed ROOT file
@@ -31,5 +35,6 @@ def airfill_dsreader(filename):
     file `filename`.
     '''
     rec = ROOT.RAT.DS.PackedEvent()
-    yield tree_reader(filename, 'PackT', 'PackEv', rec)
+    for o in tree_reader(filename, 'PackT', 'PackEv', rec):
+        yield o
 
