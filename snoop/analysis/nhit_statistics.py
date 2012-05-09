@@ -1,9 +1,9 @@
 from rat import ROOT
-from snoop.core import Processor, ProcessorAbort
+from snoop.core import Processor
 
 class NHITStatistics(Processor):
     def __init__(self):
-        Processor.__init__(self, 'NHITStatistics')
+        Processor.__init__(self, 'nhit_statistics')
         self.count = 0
         self.mean_nhit = 0.0
         self.count_lt_30 = 0
@@ -26,15 +26,12 @@ class NHITStatistics(Processor):
         else:
             self.count_gte_30 += 1
 
-    def write(self, doc={}):
-        d = doc.get('nhit_statistics', {})
-        d.setdefault('mean', self.mean_nhit)
-        d.setdefault('count_lt_30', self.count_lt_30)
-        d.setdefault('count_gte_30', self.count_gte_30)
-        doc.setdefault('nhit_statistics', d)
-        return doc
+    def sample(self):
+        doc = {
+            'mean': self.mean_nhit,
+            'count_lt_30': self.count_lt_30,
+            'count_gte_30': self.count_gte_30
+        }
 
-    def flush(self, doc={}):
-        self.write(self, doc)
-        self.__init__(self)
+        return doc
 
