@@ -12,6 +12,7 @@ class Processor:
     '''
     def __init__(self, name):
         self.name = name
+        self.enabled = True
     def event(self, event):
         '''Called once per event.'''
         pass
@@ -78,10 +79,14 @@ class ProcessorBlock:
     def event(self, ev):
         '''Call `Processor.event(ev)` for each processor'''
         for processor in self.processors:
-            try:
-                processor.event(ev)
-            except ProcessorAbort:
-                print 'Processor', processor.name, 'aborted'
+            if processor.enabled:
+                try:
+                    processor.event(ev)
+                except ProcessorAbort:
+                    print 'Processor', processor.name, 'aborted'
+                except Exception:
+                    print 'Processor', processor.name, 'encountered unhandled exception, disabling'
+                    processor.enabled = False
 
     def sample(self):
         '''Call `Processor.sample()` for each processor.
@@ -96,5 +101,6 @@ class ProcessorBlock:
         if not hasattr(self, 'pool'):
             self.pool = ThreadPool(processes=2)
 
-        return self.pool.map_async(lambda x: (x.name, x.sample()), self.processors)
+        enabled_processors = filter(lambda x: x.enabled, self.processors)
+        return self.pool.map_async(lambda x: (x.name, x.sample()), enabled_processors)
 
