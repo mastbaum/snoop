@@ -9,5 +9,6 @@ setup(
     url = 'http://github.com/mastbaum/snoop',
     packages = ['snoop', 'snoop.core', 'snoop.processors'],
     scripts = ['bin/snoop'],
+    install_requires = ['python-daemon', 'lockfile']
 )
 

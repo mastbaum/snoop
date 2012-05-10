@@ -36,8 +36,6 @@ class ProcessorBlock:
     modules will be added.
     '''
     def __init__(self, processors):
-        self.pool = ThreadPool(processes=2)
-
         if isinstance(processors[0], Processor):
             self.processors = processors
         else:
@@ -45,8 +43,9 @@ class ProcessorBlock:
             self.load_processors(processors)
 
     def __del__(self):
-        self.pool.close()
-        self.pool.join()
+        if hasattr(self, 'pool'):
+            self.pool.close()
+            self.pool.join()
 
     def load_processors(self, paths, preserve=True):
         '''(Re)load all processors found in the provided paths and add them to
@@ -54,6 +53,7 @@ class ProcessorBlock:
         with the data from the old via `Processor.load`, providing some
         rudimentary "schema evolution."
         '''
+        print 'Loading processors...'
         import pkgutil
         import inspect
         current_processors = self.processors
@@ -78,7 +78,10 @@ class ProcessorBlock:
     def event(self, ev):
         '''Call `Processor.event(ev)` for each processor'''
         for processor in self.processors:
-            processor.event(ev)
+            try:
+                processor.event(ev)
+            except ProcessorAbort:
+                print 'Processor', processor.name, 'aborted'
 
     def sample(self):
         '''Call `Processor.sample()` for each processor.
@@ -90,5 +93,8 @@ class ProcessorBlock:
         Returns a `multiprocessing.pool.AsyncResult`; `get()` the results out
         when it is `ready()`.
         '''
+        if not hasattr(self, 'pool'):
+            self.pool = ThreadPool(processes=2)
+
         return self.pool.map_async(lambda x: (x.name, x.sample()), self.processors)
 

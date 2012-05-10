@@ -1,25 +1,44 @@
 from rat import ROOT
 
+class DummyReader:
+    '''Doesn't really read anything'''
+    def __init__(self):
+        pass
+    def read(self):
+        while True:
+            yield None
+
 class FileReader:
     '''Read entries from a ROOT tree in a file.'''
     def __init__(self, filenames, tree_name, branch_name, obj):
         if not hasattr(filenames, '__iter__'):
             filenames = [filenames]
+        self.filenames = filenames
 
+        self.tree_name = tree_name
+        self.branch_name = branch_name
         self.obj = obj
+        self.event_count = 0
 
-        self.tree = ROOT.TChain(tree_name)
-        for filename in filenames:
+    def load_tree(self):
+        '''Load the ROOT tree for reading. This is deferred until the first
+        read to prevent file descriptors from getting lost if running as a
+        daemon.
+        '''
+        self.tree = ROOT.TChain(self.tree_name)
+        for filename in self.filenames:
             self.tree.Add(filename)
 
-        self.tree.SetBranchAddress(branch_name, obj)
+        self.tree.SetBranchAddress(self.branch_name, self.obj)
         self.total_events = self.tree.GetEntries()
-        self.event_count = 0
 
     def read(self):
         '''Generator of entries on the requested branch. Raises `StopIteration`
         when no more entries are available.
         '''
+        if not hasattr(self, 'tree'):
+            self.load_tree()
+
         while self.event_count < self.total_events:
             self.tree.GetEntry(self.event_count)
             yield self.obj

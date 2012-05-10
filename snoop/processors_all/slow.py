@@ -12,6 +12,7 @@ class Slow(Processor):
         self.foo += 1
 
     def sample(self):
+        print 'sample slow'
         doc = {'delay': self.delay, 'foo': self.foo}
         time.sleep(self.delay)
         p = urllib2.urlopen('http://www.google.com')

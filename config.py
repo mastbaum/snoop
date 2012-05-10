@@ -15,5 +15,6 @@ writer = PrintWriter()
 
 # Reader from which to get events
 from snoop.core.reader import AirfillReader
-reader = AirfillReader('file.root')
+#from snoop.core.reader import DummyReader
+reader = AirfillReader('/home/mastbaum/snoop/file.root')
 

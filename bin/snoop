@@ -10,14 +10,12 @@ ts_now = lambda: int(time.time()/60)
 
 def write_results(results):
     for result in results:
+        #print result.ready()
         if result.ready():
             config.writer.write(result.get(), timestamp=ts_now())
             results.remove(result)
 
-def main():
-    # build the processor block
-    processor_block = ProcessorBlock(config.processor_paths)
-
+def main(processor_block):
     events = config.reader.read()
 
     results = []
@@ -40,9 +38,10 @@ def main():
             event = events.next()
             processor_block.event(event)
         except StopIteration:
-            result = processor_block.sample()
-            results.append(result)
-            break
+            #result = processor_block.sample()
+            #results.append(result)
+            #break
+            pass
 
     # wait for any remaining samples to complete
     while len(results) > 0:
@@ -50,10 +49,48 @@ def main():
         time.sleep(0.1)
 
 if __name__ == '__main__':
-    config_path = sys.argv[1] if len(sys.argv) > 1 else 'config.py'
+    import optparse
+    parser = optparse.OptionParser('%prog <config file path> <options>')
+    parser.add_option('-d', '--daemon', action='store_true', dest='daemon', default=False)
+    options, args = parser.parse_args()
+
+    config_path = args[0] if len(args) > 1 else 'config.py'
     print 'Loading configuration from', config_path
     dir, f = os.path.split(config_path)
     sys.path.append(dir)
     config = __import__(os.path.splitext(f)[0])
-    main()
+
+    # build the processor block
+    processor_block = ProcessorBlock(config.processor_paths)
+
+    if options.daemon:
+        import signal
+        import daemon
+        import lockfile
+
+        def sigusr1_handler(signum, frame):
+            print 'Caught signal %s, reloading...' % signum
+            if processor_block is not None:
+                processor_block.load_processors(config.processor_paths)
+            return
+
+        context = daemon.DaemonContext(
+            working_directory='/home/mastbaum/snoop/', #/var/lib/snoop',
+            umask=0o002,
+            pidfile=lockfile.FileLock('/home/mastbaum/snoop/snoop.pid'),
+            stdout=sys.stdout,
+            stderr=sys.stderr,
+        )
+
+        context.signal_map = {
+            signal.SIGTERM: 'terminate',
+            signal.SIGHUP: 'terminate',
+            signal.SIGUSR1: sigusr1_handler,
+        }
+
+        with context:
+            main(processor_block)
+
+    else:
+        main(processor_block)
 
