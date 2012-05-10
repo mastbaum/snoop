@@ -1,13 +1,5 @@
 from rat import ROOT
 
-class DummyReader:
-    '''Doesn't really read anything'''
-    def __init__(self):
-        pass
-    def read(self):
-        while True:
-            yield None
-
 class FileReader:
     '''Read entries from a ROOT tree in a file.'''
     def __init__(self, filenames, tree_name, branch_name, obj):

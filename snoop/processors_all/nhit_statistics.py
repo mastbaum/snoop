@@ -9,14 +9,11 @@ class NHITStatistics(Processor):
         self.count_lt_30 = 0
         self.count_gte_30 = 0
 
-    def event(self, event):
-        if isinstance(event, ROOT.RAT.DS.PackedEvent):
-            nhit = event.NHits
-        elif isinstance(event, ROOT.RAT.DS.EV):
-            nhit = event.GetNhits()
-        else:
-            raise ProcessorAbort('unknown event type')
-
+    def process(self, nhit):
+        '''Process a single event. May be called several times per `event` if
+        the data structure contains multiple detector events (like a
+        RAT::DS::Root does).
+        '''
         self.count += 1
 
         self.mean_nhit = self.mean_nhit + (nhit - self.mean_nhit) / self.count
@@ -26,8 +23,16 @@ class NHITStatistics(Processor):
         else:
             self.count_gte_30 += 1
 
+    def event(self, event):
+        if isinstance(event, ROOT.RAT.DS.PackedEvent):
+            self.process(event.NHits)
+        elif isinstance(event, ROOT.RAT.DS.Root):
+            for iev in range(event.GetEVCount()):
+                self.process(event.GetEV(iev).GetNhits())
+        else:
+            raise ProcessorAbort('unknown event type')
+
     def sample(self):
-        print 'sample nhit'
         doc = {
             'mean': self.mean_nhit,
             'count_lt_30': self.count_lt_30,
@@ -35,4 +40,10 @@ class NHITStatistics(Processor):
         }
 
         return doc
+
+    def load(self, p):
+        self.count = p.count
+        self.mean_nhit = p.mean_nhit
+        self.count_lt_30 = p.count_lt_30
+        self.count_gte_30 = p.count_gte_30
 

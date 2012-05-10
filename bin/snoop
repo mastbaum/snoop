@@ -3,14 +3,21 @@
 import os
 import sys
 import time
+import signal
+
 from snoop.core.processor import ProcessorBlock
 
 # timestamp by minute
 ts_now = lambda: int(time.time()/60)
 
+def sigusr1_handler(signum, frame):
+    print 'Caught signal %s, reloading...' % signum
+    if processor_block is not None:
+        processor_block.load_processors(config.processor_paths)
+    return
+
 def write_results(results):
     for result in results:
-        #print result.ready()
         if result.ready():
             config.writer.write(result.get(), timestamp=ts_now())
             results.remove(result)
@@ -23,6 +30,7 @@ def main(processor_block):
     sample_count = 0
 
     # event loop
+    signal.signal(signal.SIGUSR1, sigusr1_handler)
     while True:
         # write available sample results
         write_results(results)
@@ -64,15 +72,8 @@ if __name__ == '__main__':
     processor_block = ProcessorBlock(config.processor_paths)
 
     if options.daemon:
-        import signal
         import daemon
         import lockfile
-
-        def sigusr1_handler(signum, frame):
-            print 'Caught signal %s, reloading...' % signum
-            if processor_block is not None:
-                processor_block.load_processors(config.processor_paths)
-            return
 
         context = daemon.DaemonContext(
             working_directory='/home/mastbaum/snoop/', #/var/lib/snoop',
