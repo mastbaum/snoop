@@ -7,15 +7,15 @@ from snoop.core.processor import ProcessorBlock
 from snoop.core.reader import AirfillReader
 from snoop.core.writer import PrintWriter
 
-from snoop.processors import NHITStatistics
-from snoop.processors import Slow
+import snoop.processors
 
 ts_now = lambda: int(time.time()/60)
 
-processor_block = ProcessorBlock([
-    Slow(delay=10),
-    NHITStatistics()
-])
+paths = [
+    ('snoop.processors', 'snoop')
+]
+
+processor_block = ProcessorBlock(paths)
 
 writer = PrintWriter()
 
@@ -50,6 +50,15 @@ if __name__ == '__main__':
             event = events.next()
             processor_block.event(event)
         except StopIteration:
-            time.sleep(10e-06)
-            continue
+            result = processor_block.sample()
+            results.append(result)
+            break
+
+    # wait for any remaining samples to complete
+    while len(results) > 0:
+        for result in results:
+            if result.ready():
+                writer.write(result.get(), timestamp=ts_now())
+                results.remove(result)
+        time.sleep(0.1)
 
