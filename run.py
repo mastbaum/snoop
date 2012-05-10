@@ -1,31 +1,22 @@
 import sys
 import time
-
 import config
-
 from snoop.core.processor import ProcessorBlock
-from snoop.core.reader import AirfillReader
-from snoop.core.writer import PrintWriter
 
-import snoop.processors
-
+# timestamp by minute
 ts_now = lambda: int(time.time()/60)
 
-paths = [
-    ('snoop.processors', 'snoop')
-]
+def write_results(results):
+    for result in results:
+        if result.ready():
+            config.writer.write(result.get(), timestamp=ts_now())
+            results.remove(result)
 
-processor_block = ProcessorBlock(paths)
+def main():
+    # build the processor block
+    processor_block = ProcessorBlock(config.processor_paths)
 
-writer = PrintWriter()
-
-if __name__ == '__main__':
-    if len(sys.argv) < 2:
-        print 'Usage:', sys.argv[0], '[filename]'
-        sys.exit(1)
-
-    reader = AirfillReader(sys.argv[1])    
-    events = reader.read()
+    events = config.reader.read()
 
     results = []
     start_time = time.time()
@@ -34,10 +25,7 @@ if __name__ == '__main__':
     # event loop
     while True:
         # write available sample results
-        for result in results:
-            if result.ready():
-                writer.write(result.get(), timestamp=ts_now())
-                results.remove(result)
+        write_results(results)
 
         # sample with specified period
         if time.time() - start_time > sample_count * config.sample_period:
@@ -56,9 +44,9 @@ if __name__ == '__main__':
 
     # wait for any remaining samples to complete
     while len(results) > 0:
-        for result in results:
-            if result.ready():
-                writer.write(result.get(), timestamp=ts_now())
-                results.remove(result)
+        write_results(results)
         time.sleep(0.1)
+
+if __name__ == '__main__':
+    main()
 
