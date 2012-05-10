@@ -16,6 +16,8 @@ import sys, os
 sys.path.insert(0, os.path.abspath('.'))
 sys.path.insert(0, '../')
 import config
+
+from snoop import *
 from snoop.processors_all import *
 
 # If extensions (or modules to document with autodoc) are in another directory,
