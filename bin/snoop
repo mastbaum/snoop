@@ -1,6 +1,8 @@
+#!/usr/bin/env python
+
+import os
 import sys
 import time
-import config
 from snoop.core.processor import ProcessorBlock
 
 # timestamp by minute
@@ -48,5 +50,10 @@ def main():
         time.sleep(0.1)
 
 if __name__ == '__main__':
+    config_path = sys.argv[1] if len(sys.argv) > 1 else 'config.py'
+    print 'Loading configuration from', config_path
+    dir, f = os.path.split(config_path)
+    sys.path.append(dir)
+    config = __import__(os.path.splitext(f)[0])
     main()
 
