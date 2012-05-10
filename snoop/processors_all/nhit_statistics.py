@@ -2,6 +2,7 @@ from rat import ROOT
 from snoop.core.processor import Processor, ProcessorAbort
 
 class NHITStatistics(Processor):
+    '''Compute some basic statistics on the number of hit channels per event'''
     def __init__(self):
         Processor.__init__(self, 'nhit_statistics')
         self.count = 0

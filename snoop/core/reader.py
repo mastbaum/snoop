@@ -66,7 +66,7 @@ class RATReader(FileReader):
         obj = ROOT.RAT.DS.Root()
         FileReader.__init__(self, filenames, tree_name, branch_name, obj)
 
-class DispachReader:
+class DispatchReader:
     '''Read records from the dispatcher stream at `address`.'''
     def __init__(self, address):
         import avalanche

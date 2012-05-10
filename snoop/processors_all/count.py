@@ -1,6 +1,7 @@
 from snoop.core.processor import Processor
 
 class Count(Processor):
+    '''Counts the number of events processed.'''
     def __init__(self, interval=1000):
         Processor.__init__(self, 'count')
         self.interval = interval
