@@ -5,8 +5,9 @@ class Slow(Processor):
     '''Do nothing per-event, but take a long time to sample. Simulates
     I/O-heavy sampling.
     '''
+    name = 'slow'
     def __init__(self, delay=5):
-        Processor.__init__(self, 'slow')
+        Processor.__init__(self)
         self.delay = delay
 
     def sample(self):

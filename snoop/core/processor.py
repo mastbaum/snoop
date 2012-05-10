@@ -10,8 +10,7 @@ class Processor:
     '''A Processor represents a chunk of analysis code that can be placed into
     the event loop by the user.
     '''
-    def __init__(self, name):
-        self.name = name
+    def __init__(self):
         self.enabled = True
     def event(self, event):
         '''Called once per event.'''
@@ -36,19 +35,19 @@ class ProcessorBlock:
     In the latter case, an instance of every `Processor` found in the given
     modules will be added.
     '''
-    def __init__(self, processors):
+    def __init__(self, processors, kwargs={}):
         if isinstance(processors[0], Processor):
             self.processors = processors
         else:
             self.processors = []
-            self.load_processors(processors)
+            self.load_processors(processors, kwargs)
 
     def __del__(self):
         if hasattr(self, 'pool'):
             self.pool.close()
             self.pool.join()
 
-    def load_processors(self, paths, preserve=True):
+    def load_processors(self, paths, kwargs={}, preserve=True):
         '''(Re)load all processors found in the provided paths and add them to
         this `ProcesorBlock`. If `preserve` is true, load the new instances
         with the data from the old via `Processor.load`, providing some
@@ -68,7 +67,7 @@ class ProcessorBlock:
                         cls = member[1]
                         if issubclass(cls, Processor) and not cls is Processor:
                             print 'Loading Processor', cls
-                            new_processor = getattr(module, member[0])()
+                            new_processor = getattr(module, member[0])(**kwargs.get(cls.name, {}))
                             current_processor = filter(lambda x: x.name == new_processor.name, current_processors)
                             if preserve and len(current_processor) > 0:
                                 new_processor.load(current_processor[0])

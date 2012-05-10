@@ -3,8 +3,9 @@ from snoop.core.processor import Processor, ProcessorAbort
 
 class NHITStatistics(Processor):
     '''Compute some basic statistics on the number of hit channels per event'''
+    name = 'nhit_statistics'
     def __init__(self):
-        Processor.__init__(self, 'nhit_statistics')
+        Processor.__init__(self)
         self.count = 0
         self.mean_nhit = 0.0
         self.count_lt_30 = 0
@@ -39,6 +40,9 @@ class NHITStatistics(Processor):
             'count_lt_30': self.count_lt_30,
             'count_gte_30': self.count_gte_30
         }
+
+        # reset state
+        self.__init__()
 
         return doc
 

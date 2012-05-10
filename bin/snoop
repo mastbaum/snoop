@@ -13,7 +13,8 @@ ts_now = lambda: int(time.time()/60)
 def sigusr1_handler(signum, frame):
     print 'Caught signal %s, reloading...' % signum
     if processor_block is not None:
-        processor_block.load_processors(config.processor_paths)
+        reload(config)
+        processor_block.load_processors(config.processor_paths, config.processor_kwargs)
     return
 
 def write_results(results):
@@ -69,7 +70,7 @@ if __name__ == '__main__':
     config = __import__(os.path.splitext(f)[0])
 
     # build the processor block
-    processor_block = ProcessorBlock(config.processor_paths)
+    processor_block = ProcessorBlock(config.processor_paths, kwargs=config.processor_kwargs)
 
     if options.daemon:
         import daemon

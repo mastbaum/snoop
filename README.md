@@ -25,13 +25,13 @@ Usage
 -----
 snoop is intended to be run as a daemon, but additionally can be run in the foreground or used from Python.
 
-### Daemon ###
-
-    $ snoop -d [/path/to/config.py]
-
 The default configuration file path is `./config.py`.
 
 You can communicate with snoop using signals, most importantly SIGUSR1 (10), which will reload processors from the configured processor path. If processors define a `load` function, this is used to copy state from the old processor instances to the new ones upon reloading.
+
+### Daemon ###
+
+    $ snoop -d [/path/to/config.py]
 
 ### CLI ###
 

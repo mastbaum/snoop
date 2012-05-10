@@ -4,8 +4,9 @@ class ExceptionMaker(Processor):
     '''Raise an exception after a few events. Intended for testing of
     exception handling in the event loop.
     '''
+    name = 'exception_maker'
     def __init__(self, fail_after=100):
-        Processor.__init__(self, 'exception_maker')
+        Processor.__init__(self)
         self.fail_after = fail_after
         self.count = 0
     def event(self, ev):
