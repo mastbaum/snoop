@@ -66,10 +66,10 @@ if __name__ == '__main__':
     parser.add_option('-d', '--daemon', action='store_true', dest='daemon', default=False)
     options, args = parser.parse_args()
 
-    config_path = args[0] if len(args) > 1 else 'config.py'
+    config_path = args[0] if len(args) > 0 else './config.py'
     print 'Loading configuration from', config_path
     dir, f = os.path.split(config_path)
-    sys.path.append(dir)
+    sys.path.insert(0, os.path.abspath(dir))
     config = __import__(os.path.splitext(f)[0])
 
     # build the processor block
