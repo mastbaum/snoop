@@ -1,6 +1,6 @@
 SNO(+) Online Processing
 ========================
-snoop is the online processing and monitoring tool for the SNO+ data stream. It reads event data from the dispatcher and calculates statistics and generates trend plots for the data. It is used to monitor the quality of the data being taken.
+snoop is an online data processing and monitoring tool developed for the SNO+ experiment. It reads event data from a file or `avalanche` dispatcher and calculates statistics. It is used to monitor the quality of the data being taken.
 
 Overview
 --------
@@ -13,7 +13,11 @@ With this model, there are two main classes of processors:
 
 In either case, a document is produced that represents a snapshot of the parameters the processor cares about.
 
-snoop can only get the samples to a database; the user interface layer is handled by separate software.
+snoop can only get the samples to a database; the user interface layer is handled by separate software, e.g.:
+
+    data stream --Reader-> snoop --Writer-> database --REST API-> woodstock -> client
+
+[woodstock](http://github.com/mastbaum/woodstock) was developed as a front-end.
 
 Installation
 ------------
