@@ -6,7 +6,7 @@ sample_period = 5
 # python paths to snoop processors as (name, fromlist) tuples, e.g.
 #     [ ('full.module.path', ['full.module']) ]
 processor_paths = [
-    ('snoop.processors', ['snoop'])
+    ('processors', ['.'])
 ]
 
 # keyword arguments to provide to new processor subclass instances
@@ -17,10 +17,10 @@ processor_kwargs = {
 }
 
 # Writer to handle output
-from snoop.core.writer import PrintWriter
+from snoop.writer import PrintWriter
 writer = PrintWriter()
 
 # Reader from which to get events
-from snoop.core.reader import AirfillReader
+from snoop.reader import AirfillReader
 reader = AirfillReader('/home/mastbaum/snoop/file.root')
 

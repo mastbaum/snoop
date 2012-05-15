@@ -3,8 +3,8 @@ sample_period = 5
 processor_paths = [
     ('snoop.processors', ['snoop'])
 ]
-from snoop.core.writer import PrintWriter
+from snoop.writer import PrintWriter
 writer = PrintWriter()
-from snoop.core.reader import AirfillReader
+from snoop.reader import AirfillReader
 reader = AirfillReader('foo')
 

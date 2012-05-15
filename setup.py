@@ -7,7 +7,7 @@ setup(
     author = 'Andy Mastbaum',
     author_email = 'mastbaum@hep.upenn.com',
     url = 'http://github.com/mastbaum/snoop',
-    packages = ['snoop', 'snoop.core', 'snoop.processors', 'snoop.processors_all'],
+    packages = ['snoop'],
     scripts = ['bin/snoop'],
     install_requires = ['python-daemon', 'lockfile']
 )

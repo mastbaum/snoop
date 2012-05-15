@@ -25,9 +25,19 @@ Usage
 -----
 snoop is intended to be run as a daemon, but additionally can be run in the foreground or used from Python.
 
-The default configuration file path is `./config.py`.
+You can communicate with snoop processes using signals, most importantly SIGUSR1 (10), which will reload processors from the configured processor path. If processors define a `load` function, this is used to copy state from the old processor instances to the new ones upon reloading.
 
-You can communicate with snoop using signals, most importantly SIGUSR1 (10), which will reload processors from the configured processor path. If processors define a `load` function, this is used to copy state from the old processor instances to the new ones upon reloading.
+### Configuration ###
+snoop is configured using a Python module as a configuration file. The following must be defined:
+
+* `sample_period`: The time between samples, in seconds
+* `processor_paths`: List of Python paths to processors, as (path, fromlist) tuples
+* `writer`: A `Writer` subclass instance, which will handle output
+* `reader`: A `Reader` subclass instance, from which events will be read
+
+`processor_kwargs`, a `{'name': dict}` dictionary may also be defined to supply keyword arguments to processors.
+
+The default configuration file path is `./config.py`.
 
 ### Daemon ###
 
@@ -46,7 +56,4 @@ All of snoop's functionality is available in Python modules -- see documentation
 History
 =======
 This software is completely distinct from the old snoop used in SNO, sharing only the name and purpose.
-
-SNO snoop was a collection of ROOT macros -- one that watched the dispatcher and wrote statistics to a text database and the other a script to read the database file and generate plots. Those statically-served plots were displayed on a web page. This software was prone to failure, particularly due to poor memory management, and the interface was difficult to use and not configurable.
-
 

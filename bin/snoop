@@ -5,7 +5,7 @@ import sys
 import time
 import signal
 
-from snoop.core.processor import ProcessorBlock
+from snoop.processor import ProcessorBlock
 
 # timestamp by minute
 ts_now = lambda: int(time.time()/60)
@@ -14,7 +14,10 @@ def sigusr1_handler(signum, frame):
     print 'Caught signal %s, reloading...' % signum
     if processor_block is not None:
         reload(config)
-        processor_block.load_processors(config.processor_paths, config.processor_kwargs)
+        try:
+            processor_block.load_processors(config.processor_paths, config.processor_kwargs)
+        except NameError:
+            processor_block.load_processors(config.processor_paths)
     return
 
 def write_results(results):
@@ -70,7 +73,10 @@ if __name__ == '__main__':
     config = __import__(os.path.splitext(f)[0])
 
     # build the processor block
-    processor_block = ProcessorBlock(config.processor_paths, kwargs=config.processor_kwargs)
+    try:
+        processor_block = ProcessorBlock(config.processor_paths, kwargs=config.processor_kwargs)
+    except NameError:
+        processor_block = ProcessorBlock(config.processor_paths)
 
     if options.daemon:
         import daemon
