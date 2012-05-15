@@ -18,7 +18,6 @@ sys.path.insert(0, '../')
 import config
 
 from snoop import *
-from snoop.processors_all import *
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the

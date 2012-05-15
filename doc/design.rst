@@ -1,5 +1,8 @@
 snoop Design
 ============
+
+This document outlines the design requirements for a SNOOP replacement, covering features found in both `snoop <http://github.com/mastbaum/snoop>`_ and `woodstock <http://github.com/mastbaum/woodstock>`_.
+
 Design Criteria
 ---------------
 Logic Layer

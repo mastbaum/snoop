@@ -1,10 +1,12 @@
-# dummy configuration for snoop, for sphinx
-sample_period = 5
+sample_period = 300
 processor_paths = [
-    ('snoop.processors', ['snoop'])
+    ('processors', ['.']),
 ]
+processor_kwargs = {
+    'count': {'interval': 2000},
+}
 from snoop.writer import PrintWriter
 writer = PrintWriter()
-from snoop.reader import AirfillReader
-reader = AirfillReader('foo')
+from snoop.reader import DispatchReader
+reader = DispatchReader('tcp://localhost:5024')
 

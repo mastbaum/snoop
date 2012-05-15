@@ -5,7 +5,7 @@
 
 Welcome to snoop's documentation!
 =================================
-snoop is the online processing and monitoring tool for the SNO+ data stream. It reads event data from the dispatcher and calculates statistics and generates trend plots for the data. It is used to monitor the quality of the data being taken.
+snoop is an online data processing and monitoring tool developed for the SNO+ experiment. It reads event data from a file or `avalanche <http://github.com/mastbaum/avalanche>`_ dispatcher and calculates statistics. It is used to monitor the quality of the data being taken.
 
 Overview
 --------
@@ -18,7 +18,11 @@ With this model, there are two main classes of processors:
 
 In either case, a document is produced that represents a snapshot of the parameters the processor cares about.
 
-snoop can only get the samples to a database; the user interface layer is handled by separate software.
+snoop can only get the samples to a database; the user interface layer is handled by separate software, e.g.::
+
+    data stream --Reader-> snoop --Writer-> database --REST API-> woodstock -> client
+
+`woodstock <http://github.com/mastbaum/woodstock>`_ was developed as a front-end.
 
 Installation
 ------------
@@ -30,9 +34,20 @@ Usage
 -----
 snoop is intended to be run as a daemon, but additionally can be run in the foreground or used from Python.
 
-The default configuration file path is ``./config.py``.
-
 You can communicate with snoop processes using signals, most importantly SIGUSR1 (10), which will reload processors from the configured processor path. If processors define a ``load`` function, this is used to copy state from the old processor instances to the new ones upon reloading.
+
+Configuration
+`````````````
+snoop is configured using a Python module as a configuration file. The following must be defined:
+
+* ``sample_period``: The time between samples, in seconds
+* ``processor_paths``: List of Python paths to processors, as (path, fromlist) tuples
+* ``writer``: A ``Writer`` subclass instance with which to handle output
+* ``reader``: A ``Reader`` subclass instance, from which events will be read
+
+``processor_kwargs``, a ``{'name': dict}`` dictionary may also be defined to supply keyword arguments to processors.
+
+The default configuration file path is ``./config.py``.
 
 Daemon
 ``````
@@ -61,8 +76,6 @@ History
 =======
 This software is completely distinct from the old snoop used in SNO, sharing only the name and purpose.
 
-SNO snoop was a collection of ROOT macros -- one that watched the dispatcher and wrote statistics to a text database and the other a script to read the database file and generate plots. Those statically-served plots were displayed on a web page. That software was prone to failure, particularly due to poor memory management, and the interface was difficult to use and not configurable.
-
 Documentation
 =============
 
@@ -71,7 +84,6 @@ Documentation
 
    api
    design
-   data
 
 Indices and tables
 ==================

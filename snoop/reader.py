@@ -52,7 +52,7 @@ class DispatchReader:
     def add_db(self, host, dbname, mapper):
         '''Attach a database changes feed to this reader. See `avalanche`
         documentation for more details.'''
-        self.client.add_dispatcher(host, dbname, mapper)
+        self.client.add_db(host, dbname, mapper)
 
     def read(self):
         '''Generator of events from the dispatcher.'''
