@@ -40,19 +40,19 @@ class DispatchReader:
     def __init__(self, address):
         import avalanche
         self.address = address
-        self.client = avalanche.Client()
-        self.client.add_dispatcher(address)
+        self.client = avalanche.client()
+        self.client.addDispatcher(address)
 
     def add_dispatcher(self, address):
         '''Attach an additional dispatch stream to this reader. See `avalanche`
         documentation for more details.
         '''
-        self.client.add_dispatcher(address)
+        self.client.addDispatcher(address)
 
     def add_db(self, host, dbname, mapper):
         '''Attach a database changes feed to this reader. See `avalanche`
         documentation for more details.'''
-        self.client.add_db(host, dbname, mapper)
+        self.client.addDB(host, dbname, mapper)
 
     def read(self):
         '''Generator of events from the dispatcher.'''
